@@ -26,9 +26,10 @@ func Unpack(str string) (string, error) {
 			}
 			isNumber = true
 			if dig == 0 {
-				// удалить последний добавленный символ, т к его надо повторять ноль раз
 				s := sb.String()
-				s = s[:len(s)-1]
+				// удалить последний добавленный символ (руну), т к его надо повторять ноль раз
+				runes := []rune(s)
+				s = string(runes[:len(runes)-1])
 				sb.Reset()
 				sb.WriteString(s)
 			} else {
