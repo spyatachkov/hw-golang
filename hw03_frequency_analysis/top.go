@@ -3,6 +3,7 @@ package hw03frequencyanalysis
 import (
 	"errors"
 	"regexp"
+	"sort"
 	"strings"
 	"unicode"
 )
@@ -40,13 +41,7 @@ func Top10(s string) []string {
 			continue
 		}
 
-		_, ok := uniqueWords[prepWord]
-
-		if !ok {
-			uniqueWords[prepWord] = 1
-		} else {
-			uniqueWords[prepWord]++
-		}
+		uniqueWords[prepWord]++
 	}
 
 	wordsSlice := make([]Word, len(uniqueWords)) // слайс отсортированных по количеству повторяющихся слов элементов
@@ -59,21 +54,21 @@ func Top10(s string) []string {
 		i++
 	}
 
-	length := len(wordsSlice)
-	for i := 0; i < length-1; i++ {
-		for j := 0; j < length-i-1; j++ {
-			if wordsSlice[j].Count < wordsSlice[j+1].Count {
-				wordsSlice[j], wordsSlice[j+1] = wordsSlice[j+1], wordsSlice[j]
-			}
+	sort.Slice(wordsSlice, func(i, j int) bool {
+		wCur, wNxt := wordsSlice[i], wordsSlice[j]
 
-			// если слова встретились одинаковое кол-во раз, то они сортируются лексикографически
-			if wordsSlice[j].Count == wordsSlice[j+1].Count {
-				if wordsSlice[j].Word > wordsSlice[j+1].Word {
-					wordsSlice[j], wordsSlice[j+1] = wordsSlice[j+1], wordsSlice[j]
-				}
+		if wCur.Count > wNxt.Count {
+			return true
+		}
+
+		// если слова встретились одинаковое кол-во раз, то они сортируются лексикографически
+		if wCur.Count == wNxt.Count {
+			if wCur.Word < wNxt.Word {
+				return true
 			}
 		}
-	}
+		return false
+	})
 
 	// вычисление на сколько элементов надо создать слайс для конечного результата
 	resultSliceLen := 10
