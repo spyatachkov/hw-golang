@@ -47,16 +47,67 @@ func TestCache(t *testing.T) {
 		val, ok = c.Get("ccc")
 		require.False(t, ok)
 		require.Nil(t, val)
+
+		c.Clear()
+		val, ok = c.Get("aaa")
+		require.False(t, ok)
+		require.Equal(t, nil, val)
 	})
 
 	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+		c := NewCache(3)
+		wasInCache := c.Set("first", 1)
+		require.False(t, wasInCache)
+
+		wasInCache = c.Set("second", 2)
+		require.False(t, wasInCache)
+
+		wasInCache = c.Set("third", 3)
+		require.False(t, wasInCache)
+
+		wasInCache = c.Set("fourth", 4)
+		require.False(t, wasInCache)
+
+		// перед добавлением третьего элемента вытолкнетcя первый (key=first), который был добавлен,
+		// на его место встанет первый (key=third)
+		val, ok := c.Get("first")
+		require.False(t, ok)
+		require.Nil(t, val)
+
+		// выталкиваем самый тухлый
+		c = NewCache(3)
+		// используем какие-то ключи несколько раз, чтобы появился один тухлый ключ
+		wasInCache = c.Set("first", 1)
+		require.False(t, wasInCache)
+
+		wasInCache = c.Set("second", 22)
+		require.False(t, wasInCache)
+
+		wasInCache = c.Set("third", 33)
+		require.False(t, wasInCache)
+
+		wasInCache = c.Set("second", 222)
+		require.True(t, wasInCache)
+
+		wasInCache = c.Set("third", 3)
+		require.True(t, wasInCache)
+
+		wasInCache = c.Set("second", 2)
+		require.True(t, wasInCache)
+
+		// за время добавления новых элементов должен был протухнуть элемент с key=first
+		// добавляем новый
+		wasInCache = c.Set("fresh", 7)
+		require.False(t, wasInCache)
+
+		// ищем с key=first, который должен был пропасть
+		val, ok = c.Get("first")
+		require.False(t, ok)
+		require.Nil(t, val)
 	})
 }
 
-func TestCacheMultithreading(t *testing.T) {
-	t.Skip() // Remove me if task with asterisk completed.
-
+func TestCacheMultithreading(_ *testing.T) {
 	c := NewCache(10)
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
