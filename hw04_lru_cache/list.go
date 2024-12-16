@@ -24,6 +24,7 @@ type list struct {
 func NewList() List {
 	return new(list)
 }
+
 func (l *list) Len() int {
 	return l.Size
 }
@@ -81,16 +82,22 @@ func (l *list) Remove(i *ListItem) {
 	prev := i.Prev
 	next := i.Next
 
-	if prev == nil { // удаляется самый первый
+	// удаляется самый первый элемент
+	if prev == nil {
 		next.Prev = nil
 		l.Head = next
-	} else if next == nil { // удаляется самый последний
+	} else {
+		prev.Next = next
+	}
+
+	// удаляется самый последний элемент
+	if next == nil {
 		prev.Next = nil
 		l.Tail = prev
 	} else {
-		prev.Next = next
 		next.Prev = prev
 	}
+
 	l.Size--
 }
 
