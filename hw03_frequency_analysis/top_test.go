@@ -7,7 +7,7 @@ import (
 )
 
 // Change to true if needed.
-var taskWithAsteriskIsCompleted = false
+var taskWithAsteriskIsCompleted = true
 
 var text = `Как видите, он  спускается  по  лестнице  вслед  за  своим
 	другом   Кристофером   Робином,   головой   вниз,  пересчитывая
@@ -43,9 +43,26 @@ var text = `Как видите, он  спускается  по  лестни�
 	посидеть у огня и послушать какую-нибудь интересную сказку.
 		В этот вечер...`
 
+var emojiText = `this is emoji 😃😃😃 😃 😃 😃 text test case`
+
 func TestTop10(t *testing.T) {
 	t.Run("no words in empty string", func(t *testing.T) {
 		require.Len(t, Top10(""), 0)
+	})
+
+	t.Run("emoji in text. less ten elements in result", func(t *testing.T) {
+		expected := []string{
+			"😃",
+			"case",
+			"emoji",
+			"is",
+			"test",
+			"text",
+			"this",
+			"😃😃😃",
+		}
+
+		require.Equal(t, expected, Top10(emojiText))
 	})
 
 	t.Run("positive test", func(t *testing.T) {
